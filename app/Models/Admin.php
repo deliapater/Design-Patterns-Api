@@ -8,7 +8,7 @@ class Admin extends Model
 {
     protected $fillable = ['name'];
 
-    public function __contrusct($name)
+    public function __construct($name)
     {
         parent::__construct();
         $this->name = $name;
