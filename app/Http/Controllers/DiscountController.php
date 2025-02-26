@@ -10,20 +10,20 @@ class DiscountController extends Controller
 {
     public function applyDiscount(Request $request)
     {
-        $context = new DiscountContext();
+        $amount = $request->input('amount');
+        $discountType = $request->input('type');
+        $value = $request->input('value');
 
-        switch ($request->discount_type) {
-            case 'percentage':
-                $context->setStrategy(new PercentageDiscount());
-                break;
-            case 'fixed':
-                $context->setStrategy(new FixedDiscount());
-                break;
-            default:
-                return response()->json(['error' => 'Invalid discount type'], 400);
-        }
+        $strategy = $discountType === 'percentage'
+            ? new PercentageDiscount($value)
+            : new FixedDiscount($value);
+        
+        $discountContext = new DiscountContext($strategy);
 
-        $discountedPrice = $context->applyDiscount($request->amount);
-        return response()->json(['discounted_price' => $discountedPrice]);
+        $discountedPrice = $discountContext->applyDiscount($amount);
+        return response()->json([
+            'original_price' => $amount,
+            'discounted_price' => $discountedPrice
+        ]);
     }
 }
